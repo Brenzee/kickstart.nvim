@@ -496,25 +496,19 @@ require('lazy').setup({
       local servers = {
         gopls = {},
         rust_analyzer = {},
-        -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
-        --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ts_ls = {},
-
+        ts_ls = {
+          init_options = {
+            preferences = {
+              importModuleSpecifierPreference = 'relative',
+            },
+          },
+        },
         lua_ls = {
-          -- cmd = {...},
-          -- filetypes = { ...},
-          -- capabilities = {},
           settings = {
             Lua = {
               completion = {
                 callSnippet = 'Replace',
               },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
             },
           },
         },
@@ -587,15 +581,12 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        javascript = { 'eslint', 'prettierd', 'prettier', stop_after_first = true },
-        typescript = { 'eslint', 'prettierd', 'prettier', stop_after_first = true },
-        json = { 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'eslint', 'prettierd', stop_after_first = true },
+        typescript = { 'eslint', 'prettierd', stop_after_first = true },
+        solidity = { 'solhint', 'prettierd' },
+        json = { 'prettierd', 'fixjson', stop_after_first = true },
         rust = { 'rustfmt', lsp_format = 'fallback' },
-        css = { 'prettierd', 'prettier', stop_after_first = true },
+        css = { 'prettierd', stop_after_first = true },
         html = { 'djlint', extra_args = { '--double-quote-attributes' } },
         htmldjango = { 'djlint', extra_args = { '--double-quote-attributes' } },
       },
@@ -726,13 +717,8 @@ require('lazy').setup({
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'tokyonight-night'
-
-      -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
+      -- vim.cmd.hi 'Comment gui=none'
     end,
   },
 
@@ -742,36 +728,35 @@ require('lazy').setup({
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
-
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
-
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function() end
-
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      -- require('mini.statusline').setup {
+      --   content = {
+      --     -- Configure the active statusline sections
+      --     active = function()
+      --       local mode = require('mini.statusline').section_mode { trunc_width = 80 }
+      --       local filename = require('mini.statusline').section_filename { trunc_width = 140 }
+      --       local git = require('mini.statusline').section_git { trunc_width = 75 }
+      --       local diagnostics = require('mini.statusline').section_diagnostics { trunc_width = 75 }
+      --       local lsp = require('mini.statusline').section_lsp { trunc_width = 75 }
+      --       -- local filetype = require('mini.statusline').section_filetype { trunc_width = 60 }
+      --
+      --       return table.concat({
+      --         mode,
+      --         filename,
+      --         diagnostics,
+      --         git,
+      --         lsp,
+      --       }, ' | ')
+      --     end,
+      --
+      --     -- Configure the inactive statusline sections
+      --     inactive = function()
+      --       return require('mini.statusline').section_filename()
+      --     end,
+      --   },
+      --   set_vim_settings = true, -- Automatically set options like `laststatus=3`
+      -- }
     end,
   },
   { -- Highlight, edit, and navigate code
@@ -780,6 +765,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     opts = {
       auto_install = true,
+      ensure_installed = { 'solidity' },
       highlight = {
         enable = true,
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
@@ -845,8 +831,22 @@ require('lazy').setup({
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
+      local filename_config = { 'filename', path = 1 }
       require('lualine').setup {
         icons_enabled = true,
+        globalstatus = true,
+        sections = {
+          lualine_c = {
+            filename_config,
+          },
+        },
+        inactive_sections = {
+          lualine_c = {
+            filename_config,
+          },
+          lualine_x = { 'location' },
+        },
+        extensions = { 'nvim-tree' },
       }
     end,
   },
@@ -854,6 +854,25 @@ require('lazy').setup({
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'custom.plugins.tailwind-tools',
   require 'custom.plugins.nvim-highlight-colors',
+
+  { -- You can easily change to a different colorscheme.
+    -- Change the name of the colorscheme plugin below, and then
+    -- change the command in the config to whatever the name of that colorscheme is.
+    --
+    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+    'rebelot/kanagawa.nvim',
+    priority = 1000, -- Make sure to load this before all the other start plugins.
+    init = function()
+      -- vim.cmd.colorscheme 'kanagawa'
+    end,
+  },
+  {
+    'tiagovla/tokyodark.nvim',
+    priority = 1000, -- Make sure to load this before all the other start plugins.
+    init = function()
+      -- vim.cmd.colorscheme 'tokyodark'
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
