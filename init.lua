@@ -515,6 +515,9 @@ require('lazy').setup({
         },
         solidity_ls = {},
         cssls = {},
+        fixjson = {},
+        markdownlint = {},
+        prettierd = {},
       }
 
       vim.lsp.set_log_level 'debug'
