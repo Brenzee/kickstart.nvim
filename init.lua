@@ -496,18 +496,19 @@ require('lazy').setup({
       local servers = {
         gopls = {},
         rust_analyzer = {},
+        prismals = {},
         ts_ls = {
           init_options = {
             preferences = {
-              importModuleSpecifierPreference = 'relative',
+              importmodulespecifierpreference = 'relative',
             },
           },
         },
         lua_ls = {
           settings = {
-            Lua = {
+            lua = {
               completion = {
-                callSnippet = 'Replace',
+                callsnippet = 'replace',
               },
             },
           },
@@ -515,6 +516,8 @@ require('lazy').setup({
         solidity_ls = {},
         cssls = {},
       }
+
+      vim.lsp.set_log_level 'debug'
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
@@ -589,6 +592,8 @@ require('lazy').setup({
         css = { 'prettierd', stop_after_first = true },
         html = { 'djlint', extra_args = { '--double-quote-attributes' } },
         htmldjango = { 'djlint', extra_args = { '--double-quote-attributes' } },
+        markdown = { 'markdownlint', 'prettierd', stop_after_first = true },
+        yaml = { 'prettierd' },
       },
     },
   },
@@ -722,8 +727,22 @@ require('lazy').setup({
     end,
   },
 
+  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
+  { 'EdenEast/nightfox.nvim' },
+
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  {
+    'folke/todo-comments.nvim',
+    event = 'VimEnter',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = {
+      signs = false,
+      keywords = {
+        AUDIT = { icon = '🔍', color = 'error', alt = { 'REVIEW' } }, -- Add @audit tag
+        IAUDIT = { icon = '🔍', color = 'hint' }, -- Add @audit tag
+      },
+    },
+  },
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
@@ -803,8 +822,8 @@ require('lazy').setup({
       -- empty setup using defaults
       require('nvim-tree').setup {
         filters = {
-          -- dotfiles = true,
-          -- git_ignored = false,
+          dotfiles = false,
+          git_ignored = false,
           exclude = { '.env' },
         },
       }
