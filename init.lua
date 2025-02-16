@@ -70,11 +70,13 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 8
-
 vim.opt.shiftwidth = 2
 
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
+vim.filetype.add {
+  extension = {
+    mdx = 'mdx',
+  },
+}
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -494,9 +496,7 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        gopls = {},
-        rust_analyzer = {},
-        prismals = {},
+        -- rust_analyzer = {},
         ts_ls = {
           init_options = {
             preferences = {
@@ -513,11 +513,11 @@ require('lazy').setup({
             },
           },
         },
-        solidity_ls = {},
-        cssls = {},
         fixjson = {},
-        markdownlint = {},
         prettierd = {},
+        mdx_analyzer = {
+          filetypes = { 'mdx' },
+        },
       }
 
       vim.lsp.set_log_level 'debug'
@@ -597,6 +597,7 @@ require('lazy').setup({
         htmldjango = { 'djlint', extra_args = { '--double-quote-attributes' } },
         markdown = { 'markdownlint', 'prettierd', stop_after_first = true },
         yaml = { 'prettierd' },
+        mdx = { 'prettierd' },
       },
     },
   },
@@ -752,33 +753,6 @@ require('lazy').setup({
     config = function()
       require('mini.ai').setup { n_lines = 500 }
       require('mini.surround').setup()
-      -- require('mini.statusline').setup {
-      --   content = {
-      --     -- Configure the active statusline sections
-      --     active = function()
-      --       local mode = require('mini.statusline').section_mode { trunc_width = 80 }
-      --       local filename = require('mini.statusline').section_filename { trunc_width = 140 }
-      --       local git = require('mini.statusline').section_git { trunc_width = 75 }
-      --       local diagnostics = require('mini.statusline').section_diagnostics { trunc_width = 75 }
-      --       local lsp = require('mini.statusline').section_lsp { trunc_width = 75 }
-      --       -- local filetype = require('mini.statusline').section_filetype { trunc_width = 60 }
-      --
-      --       return table.concat({
-      --         mode,
-      --         filename,
-      --         diagnostics,
-      --         git,
-      --         lsp,
-      --       }, ' | ')
-      --     end,
-      --
-      --     -- Configure the inactive statusline sections
-      --     inactive = function()
-      --       return require('mini.statusline').section_filename()
-      --     end,
-      --   },
-      --   set_vim_settings = true, -- Automatically set options like `laststatus=3`
-      -- }
     end,
   },
   { -- Highlight, edit, and navigate code
@@ -787,16 +761,18 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     opts = {
       auto_install = true,
-      ensure_installed = { 'solidity' },
+      ensure_installed = { 'solidity', 'markdown' },
       highlight = {
         enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        -- additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
+    config = function(_, opts)
+      -- dofile(vim.g.base46_cache .. 'syntax')
+      require('nvim-treesitter.configs').setup(opts)
+      -- tell treesitter to use the markdown parser for mdx files
+      vim.treesitter.language.register('markdown', 'mdx')
+    end,
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
     --
