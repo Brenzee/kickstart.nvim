@@ -154,7 +154,6 @@ require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
   'ThePrimeagen/vim-be-good',
-
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
     opts = {
@@ -277,6 +276,18 @@ require('lazy').setup({
         --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
         --   },
         -- },
+        defaults = {
+          layout_config = {
+            horizontal = {
+              width = 0.97,
+              preview_width = 0.6,
+            },
+            center = {
+              -- width = 0.97,
+              -- other center-specific options
+            },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -500,7 +511,7 @@ require('lazy').setup({
         ts_ls = {
           init_options = {
             preferences = {
-              importmodulespecifierpreference = 'relative',
+              importModuleSpecifierPreference = 'relative',
             },
           },
         },
@@ -520,7 +531,7 @@ require('lazy').setup({
         },
       }
 
-      vim.lsp.set_log_level 'debug'
+      vim.lsp.set_log_level 'WARN'
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
@@ -622,19 +633,15 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
-
-      -- Adds other completion capabilities.
-      --  nvim-cmp does not ship with all sources by default. They are split
-      --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
     },
@@ -657,31 +664,15 @@ require('lazy').setup({
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         mapping = cmp.mapping.preset.insert {
-          -- Select the [n]ext item
-          ['<C-n>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
-          ['<C-p>'] = cmp.mapping.select_prev_item(),
-
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
 
-          -- Accept ([y]es) the completion.
-          --  This will auto-import if your LSP supports it.
-          --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          ['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping.select_next_item(),
+          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
-          -- If you prefer more traditional completion keymaps,
-          -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
-          --['<Tab>'] = cmp.mapping.select_next_item(),
-          --['<S-Tab>'] = cmp.mapping.select_prev_item(),
-
-          -- Manually trigger a completion from nvim-cmp.
-          --  Generally you don't need this, because nvim-cmp will display
-          --  completions whenever it has completion options available.
           ['<C-Space>'] = cmp.mapping.complete {},
-
           -- Think of <c-l> as moving to the right of your snippet expansion.
           --  So if you have a snippet that's like:
           --  function $name($args)
@@ -731,9 +722,6 @@ require('lazy').setup({
     end,
   },
 
-  { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
-  { 'EdenEast/nightfox.nvim' },
-
   -- Highlight todo, notes, etc in comments
   {
     'folke/todo-comments.nvim',
@@ -768,9 +756,7 @@ require('lazy').setup({
       indent = { enable = true, disable = { 'ruby' } },
     },
     config = function(_, opts)
-      -- dofile(vim.g.base46_cache .. 'syntax')
       require('nvim-treesitter.configs').setup(opts)
-      -- tell treesitter to use the markdown parser for mdx files
       vim.treesitter.language.register('markdown', 'mdx')
     end,
     -- There are additional nvim-treesitter modules that you can use to interact
@@ -781,6 +767,15 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
   {
+    'nvim-treesitter/nvim-treesitter-context',
+    config = function()
+      require('treesitter-context').setup {
+        enable = true, -- Ensure the plugin is enabled
+        max_lines = 1, -- Limit the context window to display at most 1 line
+      }
+    end,
+  },
+  {
     'nvim-tree/nvim-tree.lua',
     version = '*',
     lazy = false,
@@ -788,6 +783,7 @@ require('lazy').setup({
       'nvim-tree/nvim-web-devicons',
     },
     keys = {
+      { '<D-b>', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle Tree' },
       { '<C-b>', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle Tree' },
     },
     config = function()
@@ -852,25 +848,7 @@ require('lazy').setup({
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'custom.plugins.tailwind-tools',
   require 'custom.plugins.nvim-highlight-colors',
-
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    'rebelot/kanagawa.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      -- vim.cmd.colorscheme 'kanagawa'
-    end,
-  },
-  {
-    'tiagovla/tokyodark.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      -- vim.cmd.colorscheme 'tokyodark'
-    end,
-  },
+  { 'editorconfig/editorconfig-vim' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
