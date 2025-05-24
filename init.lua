@@ -40,7 +40,7 @@ vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
 vim.opt.ignorecase = true
-vim.opt.smartcase = true
+-- vim.opt.smartcase = true
 
 -- Keep signcolumn on by default
 vim.opt.signcolumn = 'yes'
@@ -77,6 +77,9 @@ vim.filetype.add {
     mdx = 'mdx',
   },
 }
+
+vim.o.foldmethod = 'manual'
+vim.o.foldlevel = 0
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
@@ -153,6 +156,7 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  'tpope/vim-fugitive',
   'ThePrimeagen/vim-be-good',
   { -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -245,7 +249,6 @@ require('lazy').setup({
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
-    branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -531,7 +534,7 @@ require('lazy').setup({
         },
       }
 
-      vim.lsp.set_log_level 'WARN'
+      vim.lsp.set_log_level 'ERROR'
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
@@ -771,7 +774,7 @@ require('lazy').setup({
     config = function()
       require('treesitter-context').setup {
         enable = true, -- Ensure the plugin is enabled
-        max_lines = 1, -- Limit the context window to display at most 1 line
+        max_lines = 3, -- Limit the context window to display at most 1 line
       }
     end,
   },
@@ -821,33 +824,12 @@ require('lazy').setup({
       -- log_level = 'debug',
     },
   },
-  {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
-    config = function()
-      local filename_config = { 'filename', path = 1 }
-      require('lualine').setup {
-        icons_enabled = true,
-        globalstatus = true,
-        sections = {
-          lualine_c = {
-            filename_config,
-          },
-        },
-        inactive_sections = {
-          lualine_c = {
-            filename_config,
-          },
-          lualine_x = { 'location' },
-        },
-        extensions = { 'nvim-tree' },
-      }
-    end,
-  },
 
+  require 'custom.plugins.lualine',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'custom.plugins.tailwind-tools',
   require 'custom.plugins.nvim-highlight-colors',
+  require 'custom.plugins.codecompanion',
   { 'editorconfig/editorconfig-vim' },
 }, {
   ui = {
