@@ -7,7 +7,46 @@ return {
       'nvim-treesitter/nvim-treesitter',
     },
     config = function()
-      require('codecompanion').setup {}
+      require('codecompanion').setup {
+        display = {
+          action_palette = {
+            width = 95,
+            height = 10,
+            prompt = 'Prompt ',
+            provider = 'default',
+            opts = {
+              show_default_actions = true,
+              show_default_prompt_library = true,
+            },
+          },
+        },
+
+        adapters = {
+          gemini = function()
+            return require('codecompanion.adapters').extend('gemini', {
+              model = 'gemini-2.5-flash-preview-05-20',
+              env = {
+                api_key = os.getenv 'GOOGLE_API_KEY',
+              },
+            })
+          end,
+        },
+
+        strategies = {
+          chat = {
+            adapter = 'gemini',
+          },
+          inline = {
+            adapter = 'gemini',
+          },
+        },
+
+        vim.keymap.set({ 'n', 'v' }, '<C-a>', '<cmd>CodeCompanionActions<cr>', { noremap = true, silent = true }),
+        vim.keymap.set({ 'n', 'v' }, '<LocalLeader>a', '<cmd>CodeCompanionChat Toggle<cr>', { noremap = true, silent = true }),
+        vim.keymap.set('v', 'ga', '<cmd>CodeCompanionChat Add<cr>', { noremap = true, silent = true }),
+
+        vim.cmd [[cab cc CodeCompanion]],
+      }
     end,
   },
   {
