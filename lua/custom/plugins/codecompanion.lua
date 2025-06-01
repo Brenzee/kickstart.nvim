@@ -32,14 +32,14 @@ return {
           end,
         },
 
-        strategies = {
-          chat = {
-            adapter = 'gemini',
-          },
-          inline = {
-            adapter = 'gemini',
-          },
-        },
+        -- strategies = {
+        --   chat = {
+        --     adapter = 'gemini',
+        --   },
+        --   inline = {
+        --     adapter = 'gemini',
+        --   },
+        -- },
 
         vim.keymap.set({ 'n', 'v' }, '<C-a>', '<cmd>CodeCompanionActions<cr>', { noremap = true, silent = true }),
         vim.keymap.set({ 'n', 'v' }, '<LocalLeader>a', '<cmd>CodeCompanionChat Toggle<cr>', { noremap = true, silent = true }),
