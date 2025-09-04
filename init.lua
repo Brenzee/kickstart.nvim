@@ -239,10 +239,9 @@ require('lazy').setup({
         defaults = {
           layout_config = {
             horizontal = {
-              width = 0.97,
+              width = 0.9,
               preview_width = 0.6,
             },
-            center = {},
           },
         },
         extensions = {
@@ -251,7 +250,6 @@ require('lazy').setup({
           },
         },
       }
-
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
@@ -525,9 +523,6 @@ require('lazy').setup({
     opts = {
       notify_on_error = true,
       format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         local lsp_format_opt
         if disable_filetypes[vim.bo[bufnr].filetype] then
@@ -544,7 +539,6 @@ require('lazy').setup({
         lua = { 'stylua' },
         javascript = { 'eslint', 'prettierd', stop_after_first = true },
         typescript = { 'eslint', 'prettierd', stop_after_first = true },
-        -- solidity = { 'solhint', stop_after_first = true },
         json = { 'prettierd', 'fixjson', stop_after_first = true },
         rust = { 'rustfmt', lsp_format = 'fallback' },
         css = { 'prettierd', stop_after_first = true },
@@ -714,8 +708,8 @@ require('lazy').setup({
       'nvim-tree/nvim-web-devicons',
     },
     keys = {
-      { '<D-b>', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle Tree' },
-      { '<C-b>', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle Tree' },
+      -- { '<D-b>', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle Tree' },
+      { '<C-s>', '<cmd>NvimTreeToggle<CR>', desc = 'Toggle Tree' },
     },
     config = function()
       -- disable netrw at the very start of your init.lua
