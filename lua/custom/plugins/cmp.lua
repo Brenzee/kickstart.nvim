@@ -35,7 +35,7 @@ return {
       keymap = {
         preset = 'default',
         ['<CR>'] = { 'accept', 'fallback' },
-        ['<Esc>'] = { 'cancel', 'fallback' },
+        ['<Esc>'] = { 'cancel', 'hide', 'fallback' },
       },
 
       appearance = {
@@ -71,3 +71,4 @@ return {
     },
   },
 }
+

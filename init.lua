@@ -228,7 +228,6 @@ require('lazy').setup({
     },
   },
 
-  
   {
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
@@ -256,6 +255,33 @@ require('lazy').setup({
     config = function()
       require('mini.ai').setup { n_lines = 500 }
       require('mini.surround').setup()
+    end,
+  },
+  { -- Tabline
+    'romgrk/barbar.nvim',
+    dependencies = {
+      'lewis6991/gitsigns.nvim',
+      'nvim-tree/nvim-web-devicons',
+    },
+    config = function()
+      require('barbar').setup {
+        animation = false,
+        icons = {
+          buffer_index = true,
+        },
+      }
+      vim.keymap.set('n', '<M-,>', '<Cmd>BufferPrevious<CR>', { desc = 'Previous buffer' })
+      vim.keymap.set('n', '<M-.>', '<Cmd>BufferNext<CR>', { desc = 'Next buffer' })
+      vim.keymap.set('n', '<M-1>', '<Cmd>BufferGoto 1<CR>', { desc = 'Goto buffer 1' })
+      vim.keymap.set('n', '<M-2>', '<Cmd>BufferGoto 2<CR>', { desc = 'Goto buffer 2' })
+      vim.keymap.set('n', '<M-3>', '<Cmd>BufferGoto 3<CR>', { desc = 'Goto buffer 3' })
+      vim.keymap.set('n', '<M-4>', '<Cmd>BufferGoto 4<CR>', { desc = 'Goto buffer 4' })
+      vim.keymap.set('n', '<M-5>', '<Cmd>BufferGoto 5<CR>', { desc = 'Goto buffer 5' })
+      vim.keymap.set('n', '<M-6>', '<Cmd>BufferGoto 6<CR>', { desc = 'Goto buffer 6' })
+      vim.keymap.set('n', '<M-7>', '<Cmd>BufferGoto 7<CR>', { desc = 'Goto buffer 7' })
+      vim.keymap.set('n', '<M-8>', '<Cmd>BufferGoto 8<CR>', { desc = 'Goto buffer 8' })
+      vim.keymap.set('n', '<M-9>', '<Cmd>BufferGoto 9<CR>', { desc = 'Goto buffer 9' })
+      vim.keymap.set('n', '<M-w>', '<Cmd>BufferClose<CR>', { desc = 'Close buffer' })
     end,
   },
   { -- Highlight, edit, and navigate code
