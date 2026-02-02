@@ -299,6 +299,7 @@ require('lazy').setup({
     config = function(_, opts)
       require('nvim-treesitter.configs').setup(opts)
       vim.treesitter.language.register('markdown', 'mdx')
+      vim.treesitter.language.register('json', 'jsonl')
     end,
   },
   {
